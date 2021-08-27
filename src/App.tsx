@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import { ICard } from './iCard';
+import CardComponent  from "./CardComponent";
 
 function App() {
   //create state to hold onto data we want to display to user
-  const [cardsFound, setCardsFound] = useState([]);
+  const [cardsFound, setCardsFound] = useState<ICard[]>([]);
   const [cardSearch, setCardSearch] = useState('');
 
   // api call const searchForRecipes async await
   
-  const searchForMagicCards = async (query: string): Promise<any> => {
+  const searchForMagicCards = async (query: string): Promise<ICard[]> => {
     const result = await fetch(`https://api.magicthegathering.io/v1/cards?name=${query}`);
     return (await result.json()).cards;
   }
@@ -30,7 +32,7 @@ function App() {
         setCardsFound(response);
       }
       })()
-  }, [cardSearch]); //this is a dependency - only calls the useEffect if card search
+  }, [cardSearch]); //this is a dependency - only calls the useEffect if cardSearch state is updated 'listens to state' 
 
   return (
     <div className="App">
@@ -39,7 +41,14 @@ function App() {
         <input id="searchText" type="text" />
         <button>Search</button>
       </form>
-      
+      {cardSearch} && <p>Results for { cardSearch }...</p>
+
+      <div className="card-container">
+        {cardsFound.length &&
+          cardsFound.map(card =>
+            (<CardComponent key={card.id} card={card} />)
+          )}
+      </div>
     </div>
   );
 }
